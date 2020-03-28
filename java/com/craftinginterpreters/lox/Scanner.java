@@ -76,6 +76,9 @@ class Scanner {
                 if (match('/')) {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (match('*')) {
+                    advance(); // Consume '*'.
+                    comment();
                 } else {
                     addToken(SLASH);
                 }
@@ -129,6 +132,23 @@ class Scanner {
         }
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    private void comment() {
+        while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        // Unterminated comment.
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated comment.");
+            return;
+        }
+
+        // The closing * and /.
+        advance();
+        advance();
     }
 
     private void string() {
