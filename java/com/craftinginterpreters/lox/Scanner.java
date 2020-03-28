@@ -77,7 +77,6 @@ class Scanner {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else if (match('*')) {
-                    advance(); // Consume '*'.
                     comment();
                 } else {
                     addToken(SLASH);
