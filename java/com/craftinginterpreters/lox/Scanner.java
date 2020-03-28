@@ -134,20 +134,32 @@ class Scanner {
     }
 
     private void comment() {
-        while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
-            if (peek() == '\n') line++;
-            advance();
+        int depth = 1;
+
+        while (depth > 0 && !isAtEnd()) {
+            char c = advance();
+
+            // Open nested comment.
+            if (c == '/' && match('*')) {
+                depth += 1;
+            }
+
+            // Close nested comment.
+            if (c == '*' && match('/')) {
+                depth -= 1;
+            }
+
+            // New line.
+            if (c == '\n') {
+                line++;
+            }
         }
 
         // Unterminated comment.
-        if (isAtEnd()) {
+        if (depth != 0) {
             Lox.error(line, "Unterminated comment.");
             return;
         }
-
-        // The closing * and /.
-        advance();
-        advance();
     }
 
     private void string() {
